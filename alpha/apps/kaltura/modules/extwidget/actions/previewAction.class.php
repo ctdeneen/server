@@ -7,8 +7,6 @@ class previewAction extends kalturaAction
 {
 	public function execute ( ) 
 	{
-		// Prevent the page fron being embeded in an iframe
-		header( 'X-Frame-Options: SAMEORIGIN' );
 
 		$this->uiconf_id = intval($this->getRequestParameter('uiconf_id'));
 		if(!$this->uiconf_id)
@@ -132,7 +130,10 @@ class previewAction extends kalturaAction
 				$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
 			}
 		}
-		$embedParams['flashVars'] = $flashVars;
+		// Don't include flashvars if empty array
+		if( count($flashVars) ) {
+			$embedParams['flashVars'] = $flashVars;
+		}
 
 		// Export embedParams to our view
 		$this->embedParams = $embedParams;
