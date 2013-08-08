@@ -110,6 +110,8 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function save(PropelPDO $con = null, $isClone = false)
 	{
+		$this->validateConfFilesExistance();
+			
 		try
 		{
 			$res = parent::save( $con );
@@ -175,6 +177,17 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		return $ret;
 	}
 
+	private function validateConfFilesExistance()
+	{
+		if($this->requireFileForUiConfType() && $this->isNew())
+		{
+			if(!$this->data_content)
+				$this->setConfFile('');
+			if($this->getCreationMode() == self::UI_CONF_CREATION_MODE_WIZARD && !$this->data_content_2)
+				$this->setConfFileFeatures('');
+		}
+	}
+
 	private static function initUiConfTypeMap()
 	{
 		if ( self::$UI_CONF_OBJ_TYPE_MAP == null )
@@ -205,8 +218,51 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		}
 	}
 
+	private static function initUiConfRequiredFile()
+	{
+		if ( self::$REQUIRE_UI_CONF_FILE_FOR_TYPE == null )
+		{
+			self::$REQUIRE_UI_CONF_FILE_FOR_TYPE = array (
+				self::UI_CONF_TYPE_GENERIC => false,
+				self::UI_CONF_TYPE_WIDGET => true,
+				self::UI_CONF_TYPE_CW => true,
+				self::UI_CONF_TYPE_EDITOR => true,
+				self::UI_CONF_TYPE_ADVANCED_EDITOR => true,
+				self::UI_CONF_TYPE_PLAYLIST => true,
+				self::UI_CONF_TYPE_KMC_APP_STUDIO => true,
+				self::UI_CONF_TYPE_KRECORD => false,
+				self::UI_CONF_TYPE_KDP3 => true,
+				self::UI_CONF_TYPE_KMC_ACCOUNT => true,
+				self::UI_CONF_TYPE_KMC_ANALYTICS => true,
+				self::UI_CONF_TYPE_KMC_CONTENT => true,
+				self::UI_CONF_TYPE_KMC_DASHBOARD => true,
+				self::UI_CONF_TYPE_KMC_LOGIN => true,
+				self::UI_CONF_TYPE_SLP => true,
+				self::UI_CONF_CLIENTSIDE_ENCODER => true,
+				self::UI_CONF_KMC_GENERAL => true,
+				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => false,
+				self::UI_CONF_CLIPPER => false,
+				self::UI_CONF_TYPE_KSR => true,
+				self::UI_CONF_TYPE_KUPLOAD => false,
+				self::UI_CONF_TYPE_HTML5 => true,
+			);
+		}
+	}
+
 	public function isValid()
 	{
+		if($this->requireFileForUiConfType())
+		{
+			try{
+				$content = $this->getConfFile(true);
+				if($this->getCreationMode() == self::UI_CONF_CREATION_MODE_WIZARD)
+					$content2 = $this->getConfFile2(true);
+			}
+			catch(Exception $ex)
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
@@ -227,6 +283,12 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		$t = parent::getObjType();
 		if ( empty ( $t ) ) $t = self::UI_CONF_TYPE_WIDGET;
 		return $t;
+	}
+
+	public function requireFileForUiConfType( )
+	{
+		self::initUiConfRequiredFile();
+		return self::$REQUIRE_UI_CONF_FILE_FOR_TYPE[$this->getType()];
 	}
 
 	/**
@@ -352,25 +414,41 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			$this->data_content = $v;
 			$this->should_call_set_data_content = true;
 		}
+		elseif($this->isNew() && $this->requireFileForUiConfType())
+		{
+			$this->data_content = "";
+			$this->should_call_set_data_content = true;
+		}
 	}
 
-	private function getContentFileImpl ( $file_suffix = null )
+	private function getContentFileImpl ( $file_suffix = null , $strict = true)
 	{
 		if ( $file_suffix )
+		{
 			$sync_key = $this->getSyncKey( self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES );
+			$strict = false; // this file is optional
+		}
 		else
+		{
 			$sync_key = $this->getSyncKey( self::FILE_SYNC_UICONF_SUB_TYPE_DATA );
+			if(!$this->getId() || !$strict) // when doing autoFillObjectFromObject, ID might be missing, and in that case file is probably not mandatory
+				$strict = false; // object has no ID or requested not to be strict at all
+			else
+				$strict = true; // object has ID or strict specified, so no file will be found for incomplete key
+		}
 
-		return kFileSyncUtils::file_get_contents( $sync_key , true , false );
+		return kFileSyncUtils::file_get_contents( $sync_key , true , $strict );
 	}
 
-	public function getConfFile( $force_fetch = false )
+	public function getConfFile( $force_fetch = false , $strict = true )
 	{
 		$contents = "";
 
 		if ( $this->data_content !== null && ! $force_fetch ) return $this->data_content;
+		if(!$this->requireFileForUiConfType())
+			$strict = false;
 
-		$contents = $this->getContentFileImpl( null );
+		$contents = $this->getContentFileImpl( null , $strict );
 		return $contents;
 	}
 
@@ -381,16 +459,24 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			$this->data_content_2 = $v;
 			$this->should_call_set_data_content2 = true;
 		}
+		elseif($this->isNew() && $this->requireFileForUiConfType())
+		{
+			$this->data_content_2 = "";
+			$this->should_call_set_data_content2 = true;
+		}
 	}
 
 	// will fetch
-	public function getConfFile2 ( $force_fetch = false )
+	public function getConfFile2 ( $force_fetch = false , $strict = true )
 	{
 		$contents = "";
 
 		if ( $this->data_content_2 !== null  && ! $force_fetch ) return $this->data_content_2;
 
-		$contents = $this->getContentFileImpl( self::FILE_NAME_FEATURES );
+		if(!$this->requireFileForUiConfType())
+			$strict = false;
+
+		$contents = $this->getContentFileImpl( self::FILE_NAME_FEATURES , $strict);
 		return $contents;
 	}
 
@@ -401,9 +487,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 
 	// check this !
-	public function getConfFileFeatures ( $force_fetch = false )
+	public function getConfFileFeatures ( $force_fetch = false , $strict = true )
 	{
-		return $this->getConfFile2( $force_fetch = false );
+		return $this->getConfFile2( $force_fetch = false , $strict = true );
 	}
 
 	private $m_file_time;
