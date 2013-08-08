@@ -274,7 +274,7 @@ jQuery(function () {
 					<div id="uiConfData" style="display:none;">
 						<div class="item">
 							<label>Conf File:</label>
-							<textarea name="uiconf_confFile" cols="80" rows="10"><?php echo htmlspecialchars($uiConf->getConfFile(false, false)); ?></textarea>
+							<textarea name="uiconf_confFile" cols="80" rows="10"><?php echo htmlspecialchars($uiConf->getConfFile(false)); ?></textarea>
 						</div>
 						<div class="item">
 							<label>Features File:</label>
