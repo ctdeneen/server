@@ -7,28 +7,21 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob) {
+	public function updatedJob(BatchJob $dbBatchJob) 
+	{
 		switch ($dbBatchJob->getStatus()) {
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				$data = $dbBatchJob->getData();
 				$kontikiFileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
                 /* @var $data kStorageExportJobData */
                 $asset = assetPeer::retrieveByFileSync($kontikiFileSync);
-                $asset->addTags(array(KontikiPlugin::KONTIKI_ASSET_TAG));
+                $asset->setTags(KontikiPlugin::KONTIKI_ASSET_TAG);
                 $asset->save();
                 //Get Kontiki file sync and set the external URL
                 $kontikiFileSync->setFileRoot("");
                 $kontikiFileSync->setFilePath($data->getContentMoid());
                 $kontikiFileSync->save();
             break;
-			case BatchJob::BATCHJOB_STATUS_FAILED:
-                $entry = entryPeer::retrieveByPK($dbBatchJob->getEntryId());
-                $entry->setStatus(entryStatus::ERROR_IMPORTING);
-				$entry->save();
-                break;
-			default:
-				
-				break;
 		}
 
 		return true;
@@ -42,7 +35,8 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
 		if ($dbBatchJob->getJobType() == BatchJobType::STORAGE_EXPORT
             && $dbBatchJob->getJobSubType() == KontikiPlugin::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
 		{
-		    return true;
+			if (KontikiPlugin::isAllowedPartner($dbBatchJob->getPartnerId()))
+		    	return true;
 		}
         
         return false;
