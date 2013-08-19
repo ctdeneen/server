@@ -404,4 +404,9 @@ class KSecureEntryHelper
 	{
 		$this->hashes = $hashes;
 	}
+	
+	public function getContextResult()
+	{
+		return $this->contextResult;
+	}
 }
