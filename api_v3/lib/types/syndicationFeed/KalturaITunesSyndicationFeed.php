@@ -66,6 +66,12 @@ class KalturaITunesSyndicationFeed extends KalturaBaseSyndicationFeed
          */
         public $feedAuthor;
         
+        /**
+         * true in case you want to enfore the palylist order on the feed false otherwise 
+         * @var KalturaNullableBoolean
+         */
+        public $enforceOrder = KalturaNullableBoolean::FALSE_VALUE;
+        
 	function __construct()
 	{
 		$this->type = KalturaSyndicationFeedType::ITUNES;
@@ -81,6 +87,7 @@ class KalturaITunesSyndicationFeed extends KalturaBaseSyndicationFeed
                 "feedImageUrl",
                 "adultContent",
                 "feedAuthor",
+				"enforceOrder",
 	);
 	
 	public function getMapBetweenObjects()
