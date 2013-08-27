@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- * @service palyReadyDrm
+ * @service playReadyDrm
  * @package plugins.playReady
  * @subpackage api.services
  */

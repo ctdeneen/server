@@ -46,7 +46,7 @@ class PlayReadyPlayRight extends PlayReadyRight
 	private $firstPlayExpiration;
 	
     /**
-	 * @var int
+	 * @var string
 	 */
 	private $playEnablers;
 	
@@ -170,7 +170,7 @@ class PlayReadyPlayRight extends PlayReadyRight
 	}
 
 	/**
-	 * @param int $playEnablers
+	 * @param string $playEnablers
 	 */
 	public function setPlayEnablers($playEnablers) {
 		$this->playEnablers = $playEnablers;

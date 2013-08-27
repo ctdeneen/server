@@ -46,7 +46,7 @@ class KalturaPlayReadyPlayRight extends KalturaPlayReadyRight
 	public $firstPlayExpiration;
 	
     /**
-	 * @var int
+	 * @var string
 	 */
 	public $playEnablers; 
 	

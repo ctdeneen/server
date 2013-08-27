@@ -15,21 +15,21 @@ class KalturaPlayReadyLicenseDetails extends KalturaObject
 	/**
 	 * License begin date
 	 * 
-	 * @var string
+	 * @var int
 	 */
 	public $beginDate;
 	
 	/**
 	 * License expiration date
 	 * 
-	 * @var string
+	 * @var int
 	 */
 	public $expirationDate;
 	
 	/**
 	 * License removal date
 	 * 
-	 * @var string
+	 * @var int
 	 */
 	public $removalDate;
 	
