@@ -178,4 +178,25 @@ class DrmProfileService extends KalturaBaseService
 		
 		return $response;
 	}
+	
+	/**
+	 * Retrieve a KalturaDrmProfile object by provider, if no specific profile defined return default profile
+	 * 
+	 * @action getByProvider
+	 * @param KalturaDrmProviderType $provider
+	 * @return KalturaDrmProfile
+	 */
+	public function getByProviderAction(KalturaDrmProviderType $provider)
+	{
+		$dbDrmProfile = DrmProfilePeer::retrieveByProvider($provider);
+		if(!$dbDrmProfile)
+		{
+			$dbDrmProfile = KalturaPluginManager::loadObject('DrmProfile', $provider);
+		}
+		
+		$drmProfile = KalturaDrmProfile::getInstanceByType($provider);
+		$drmProfile->fromObject($dbDrmProfile);
+		
+		return $drmProfile;
+	}
 }

@@ -45,8 +45,11 @@ class KWidevineOperationEngine extends KOperationEngine
 		
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
-		$wvAssetId = $this->registerAsset();
-		$this->encryptPackage();		
+		$drmPlugin = KalturaDrmClientPlugin::get(KBatchBase::$kClient);
+		$profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::WIDEVINE);
+		
+		$wvAssetId = $this->registerAsset($profile);
+		$this->encryptPackage($profile);		
 		$this->updateFlavorAsset($wvAssetId);
 		
 		KBatchBase::unimpersonate();	
@@ -54,7 +57,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		return true;
 	}
 	
-	private function registerAsset()
+	private function registerAsset($profile)
 	{
 		$wvAssetId = '';
 		$policy = null;
@@ -74,10 +77,10 @@ class KWidevineOperationEngine extends KOperationEngine
 		}
 		
 		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
-										$this->params->wvLicenseServerUrl,
+										$profile->licenseServerUrl,
 										$this->packageName,
 										null,
-										$this->params->portal,
+										$profile->portal,
 										$policy,
 										$this->data->flavorParamsOutput->widevineDistributionStartDate,
 										$this->data->flavorParamsOutput->widevineDistributionEndDate,
@@ -96,7 +99,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		return $wvAssetId;
 	}
 	
-	private function encryptPackage()
+	private function encryptPackage($profile)
 	{
 		$returnValue = 0;
 		$output = array();
@@ -106,14 +109,14 @@ class KWidevineOperationEngine extends KOperationEngine
 				
 		$cmd = KWidevineBatchHelper::getEncryptPackageCmdLine(
 										$this->params->widevineExe, 
-										$this->params->wvLicenseServerUrl, 
-										$this->params->iv, 
-										$this->params->key, 
+										$profile->licenseServerUrl, 
+										$profile->iv, 
+										$profile->key, 
 										$this->packageName, 
 										$inputFiles, 
 										$this->data->destFileSyncLocalPath,
-										$this->params->gop,
-										$this->params->portal);
+										$profile->maxGop,
+										$profile->portal);
 										
 		exec($cmd, $output, $returnValue);
 		KalturaLog::debug('Command execution output: '.print_r($output));

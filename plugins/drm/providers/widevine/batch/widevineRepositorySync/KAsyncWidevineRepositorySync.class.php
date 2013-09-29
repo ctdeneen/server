@@ -56,10 +56,13 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 		$widevineAssets = $dataWrap->getWidevineAssetIds();
 		$licenseStartDate = $dataWrap->getLicenseStartDate();
 		$licenseEndDate = $dataWrap->getLicenseEndDate();
-
+		
+		$drmPlugin = KalturaDrmClientPlugin::get(KBatchBase::$kClient);
+		$profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::WIDEVINE);
+		
 		foreach ($widevineAssets as $assetId) 
 		{
-			$this->updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate);
+			$this->updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate, $profile);
 		}
 		
 		$this->updateFlavorAssets($job, $dataWrap);
@@ -73,17 +76,17 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	 * @param string $licenseEndDate
 	 * @throws kApplicativeException
 	 */
-	private function updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate)
+	private function updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate, $profile)
 	{
 		KalturaLog::debug("Update asset [".$assetId."] license start date [".$licenseStartDate.'] license end date ['.$licenseEndDate.']');
 		
 		$errorMessage = '';
 		
 		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
-										self::$taskConfig->params->wvLicenseServerUrl,
+										$profile->licenseServerUrl,
 										null,
 										$assetId,
-										self::$taskConfig->params->portal,
+										$profile->portal,
 										null,
 										$licenseStartDate,
 										$licenseEndDate,
