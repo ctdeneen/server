@@ -83,7 +83,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 		$errorMessage = '';
 		
 		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
-										$profile->licenseServerUrl,
+										$profile->regServerHost,
 										null,
 										$assetId,
 										$profile->portal,

@@ -1163,6 +1163,9 @@ return array(
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::HTML' => 'HTML',
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::TEXT' => 'Text',
 
+	'Kaltura_Client_Drm_Enum_DrmProfileStatus::ACTIVE' => 'Active',
+
+	'Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE' => 'Widevine',
 
 	// user role
 	'user role intro text' => '',

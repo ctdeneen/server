@@ -29,6 +29,11 @@ class KalturaWidevineProfile extends KalturaDrmProfile
 	 * @var int
 	 */	
 	public $maxGop;
+
+	/**
+	 * @var string
+	 */
+	public $regServerHost;
 	
 	
 	private static $map_between_objects = array(
@@ -36,7 +41,8 @@ class KalturaWidevineProfile extends KalturaDrmProfile
 		'iv',
 		'owner',
 		'portal',
-		'maxGop'
+		'maxGop',
+		'regServerHost'
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -15,6 +15,7 @@ class WidevineProfile extends DrmProfile
 	const CUSTOM_DATA_WIDEVINE_OWNER = 'widevine_owner';
 	const CUSTOM_DATA_WIDEVINE_PORTAL = 'widevine_portal';
 	const CUSTOM_DATA_WIDEVINE_MAX_GOP = 'widevine_max_gop';
+	const CUSTOM_DATA_WIDEVINE_REG_SERVER_HOST = 'widevine_reg_server_host';
 	
 	/**
 	 * @return string
@@ -69,7 +70,10 @@ class WidevineProfile extends DrmProfile
 	 */
 	public function getPortal()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_WIDEVINE_PORTAL);
+		$portal = $this->getFromCustomData(self::CUSTOM_DATA_WIDEVINE_PORTAL);
+		if(!$portal)
+			return WidevinePlugin::getWidevineConfigParam('portal');
+		return $portal;		
 	}
 	
 	public function setPortal($portal)
@@ -109,5 +113,21 @@ class WidevineProfile extends DrmProfile
 	public function setMaxGop($gop)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_WIDEVINE_MAX_GOP, $gop);
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getRegServerHost()
+	{
+		$host = $this->getFromCustomData(self::CUSTOM_DATA_WIDEVINE_REG_SERVER_HOST);
+		if(!$host)
+			$host = WidevinePlugin::getWidevineConfigParam('reg_server_host');
+		return $host;
+	}
+	
+	public function setRegServerHost($host)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_WIDEVINE_REG_SERVER_HOST, $host);
 	}
 }

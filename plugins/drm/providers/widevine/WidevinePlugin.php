@@ -102,8 +102,25 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		}		
 		if($baseClass == 'KalturaDrmProfile' && $enumValue == WidevinePlugin::getWidevineProviderCoreValue())
 			return new KalturaWidevineProfile();
+		if($baseClass == 'KalturaDrmProfile' && $enumValue == self::getApiValue(WidevineProviderType::WIDEVINE))
+			return new KalturaWidevineProfile();
+						
 		if($baseClass == 'DrmProfile' && $enumValue == WidevinePlugin::getWidevineProviderCoreValue())
 			return new WidevineProfile();
+
+		if (class_exists('Kaltura_Client_Client'))
+		{
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+    		{
+    			return new Kaltura_Client_Widevine_Type_WidevineProfile();
+    		}
+    		if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+    		{
+     			return new Form_WidevineProfileConfigureExtend_SubForm();
+    		}	   		
+    		
+		}
+			
 		return null;
 	}
 	
@@ -151,8 +168,24 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		}		
 		if($baseClass == 'KalturaDrmProfile' && $enumValue == WidevinePlugin::getWidevineProviderCoreValue())
 			return 'KalturaWidevineProfile';
+		if($baseClass == 'KalturaDrmProfile' && $enumValue == self::getApiValue(WidevineProviderType::WIDEVINE))
+			return 'KalturaWidevineProfile';
+			
 		if($baseClass == 'DrmProfile' && $enumValue == WidevinePlugin::getWidevineProviderCoreValue())
 			return 'WidevineProfile';
+			
+		if (class_exists('Kaltura_Client_Client'))
+		{
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+    		{
+    			return 'Kaltura_Client_Widevine_Type_WidevineProfile';
+    		}
+    		
+    		if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+    		{
+     			return 'Form_WidevineProfileConfigureExtend_SubForm';
+    		}	   		
+		}
 			
 		return null;
 	}

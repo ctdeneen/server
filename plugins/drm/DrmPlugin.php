@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions
+class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'drm';
 	
@@ -30,6 +30,10 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	public static function getApplicationPages()
 	{
 		$pages = array();
+		$pages[] = new DrmProfileListAction();
+		$pages[] = new DrmProfileConfigureAction();
+		$pages[] = new DrmProfileDeleteAction();
+
 		return $pages;
 	}
 	
@@ -45,7 +49,20 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 		if(!$partner)
 			return false;
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);			
-	}	
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{	
+		if(is_null($baseEnumName))
+			return array('DrmPermissionName');		
+		if($baseEnumName == 'PermissionName')
+			return array('DrmPermissionName');
+			
+		return array();
+	}
 	
 	public static function getConfigParam($configName, $key)
 	{

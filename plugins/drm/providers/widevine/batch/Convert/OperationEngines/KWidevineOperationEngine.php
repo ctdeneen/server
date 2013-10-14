@@ -77,7 +77,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		}
 		
 		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
-										$profile->licenseServerUrl,
+										$profile->regServerHost,
 										$this->packageName,
 										null,
 										$profile->portal,
@@ -109,7 +109,7 @@ class KWidevineOperationEngine extends KOperationEngine
 				
 		$cmd = KWidevineBatchHelper::getEncryptPackageCmdLine(
 										$this->params->widevineExe, 
-										$profile->licenseServerUrl, 
+										$profile->regServerHost, 
 										$profile->iv, 
 										$profile->key, 
 										$this->packageName, 

@@ -47,18 +47,18 @@ class DrmProfileService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::PLUGIN_NOT_AVAILABLE_FOR_PARTNER, DrmPlugin::getPluginName(), $drmProfile->partnerId);
 		}
+		
+		$dbDrmProfile = $drmProfile->toInsertableObject();
+		
+		if(DrmProfilePeer::retrieveByProvider($dbDrmProfile->getProvider()))
+		{
+			throw new KalturaAPIException(DrmErrors::ACTIVE_PROVIDER_PROFILE_ALREADY_EXIST, $drmProfile->provider);
+		}
 
 		// save in database
-		$dbDrmProfile = $drmProfile->toInsertableObject();
-		try 
-		{	
-			$dbDrmProfile->save();
-		}
-		catch(PropelException $e)
-		{
-			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
-				throw new KalturaAPIException(DrmErrors::ACTIVE_PROVIDER_PROFILE_ALREADY_EXIST, $drmProfile->provider);
-		}
+		
+		$dbDrmProfile->save();
+		
 		// return the saved object
 		$drmProfile = KalturaDrmProfile::getInstanceByType($dbDrmProfile->getProvider());
 		$drmProfile->fromObject($dbDrmProfile);
@@ -97,7 +97,6 @@ class DrmProfileService extends KalturaBaseService
 	 * @return KalturaDrmProfile
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
-	 * @throws DrmErrors::ACTIVE_PROVIDER_PROFILE_ALREADY_EXIST
 	 */	
 	public function updateAction($drmProfileId, KalturaDrmProfile $drmProfile)
 	{
@@ -108,15 +107,7 @@ class DrmProfileService extends KalturaBaseService
 		}
 								
 		$dbDrmProfile = $drmProfile->toUpdatableObject($dbDrmProfile);
-		try 
-		{	
-			$dbDrmProfile->save();
-		}
-		catch(PropelException $e)
-		{
-			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
-				throw new KalturaAPIException(DrmErrors::ACTIVE_PROVIDER_PROFILE_ALREADY_EXIST, $drmProfile->provider);
-		}
+		$dbDrmProfile->save();
 			
 		$drmProfile = KalturaDrmProfile::getInstanceByType($dbDrmProfile->getProvider());
 		$drmProfile->fromObject($dbDrmProfile);
@@ -186,17 +177,21 @@ class DrmProfileService extends KalturaBaseService
 	 * @param KalturaDrmProviderType $provider
 	 * @return KalturaDrmProfile
 	 */
-	public function getByProviderAction(KalturaDrmProviderType $provider)
-	{
-		$dbDrmProfile = DrmProfilePeer::retrieveByProvider($provider);
+	public function getByProviderAction($provider)
+	{	
+		$drmProfile = KalturaDrmProfile::getInstanceByType($provider);
+		$drmProfile->provider = $provider;
+		$tmpDbProfile = $drmProfile->toObject();
+			
+		$dbDrmProfile = DrmProfilePeer::retrieveByProvider($tmpDbProfile->getProvider());
 		if(!$dbDrmProfile)
 		{
-			$dbDrmProfile = KalturaPluginManager::loadObject('DrmProfile', $provider);
-		}
-		
-		$drmProfile = KalturaDrmProfile::getInstanceByType($provider);
+			$dbDrmProfile = KalturaPluginManager::loadObject('DrmProfile', $tmpDbProfile->getProvider());
+			$dbDrmProfile->setName('default');
+			$dbDrmProfile->setProvider($tmpDbProfile->getProvider());
+		}		
 		$drmProfile->fromObject($dbDrmProfile);
-		
+
 		return $drmProfile;
 	}
 }

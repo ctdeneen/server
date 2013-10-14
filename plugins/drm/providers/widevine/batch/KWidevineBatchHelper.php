@@ -45,12 +45,12 @@ class KWidevineBatchHelper
 	 * 
 	 */
 	public static function getEncryptPackageCmdLine(
-							$widevineExe, $wvLicenseServerUrl, $iv, $key, $assetName, $inputFiles, $destinationFile, $gop, $portal = null)
+							$widevineExe, $wvRegServerHost, $iv, $key, $assetName, $inputFiles, $destinationFile, $gop, $portal = null)
 	{
 		if(!$portal)
 			$portal = WidevinePlugin::KALTURA_PROVIDER;
 		
-		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvLicenseServerUrl.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop;
+		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvRegServerHost.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop;
 		
 		KalturaLog::debug("Encrypt package command: ".$cmd);
 		
@@ -76,7 +76,7 @@ class KWidevineBatchHelper
 	* https://register.uat.widevine.com/widevine/cypherpc/cgi-bin/GetAsset.cgi?asset=test537&owner=kaltura&provider=kaltura
 	*/
 	public static function sendRegisterAssetRequest(
-							$wvLicenseServerUrl, $assetName = null, $assetId = null, $portal = null, 
+							$wvRegServerHost, $assetName = null, $assetId = null, $portal = null, 
 							$policy = null, $licenseStartDate = null, $licenseEndDate = null, &$errorMessage)
 	{
 		$params = array();
@@ -96,7 +96,7 @@ class KWidevineBatchHelper
 			$params[self::OWNER] = $portal;
 			$params[self::PROVIDER] = $portal;
 			
-			$response = self::sendHttpRequest($wvLicenseServerUrl, WidevinePlugin::GET_ASSET_CGI, $params);
+			$response = self::sendHttpRequest($wvRegServerHost, WidevinePlugin::GET_ASSET_CGI, $params);
 			if($response[self::STATUS] == 1)
 			{
 				$assetName = $response[self::ASSET_NAME];
@@ -128,7 +128,7 @@ class KWidevineBatchHelper
 		if($licenseEndDate)
 			$providerParams[self::LICEND] = $licenseEndDate;
 				
-		$response = self::sendHttpRequest($wvLicenseServerUrl, WidevinePlugin::REGISTER_ASSET_CGI, $params, $providerParams);
+		$response = self::sendHttpRequest($wvRegServerHost, WidevinePlugin::REGISTER_ASSET_CGI, $params, $providerParams);
 		
 		if($response[self::STATUS] == 1)
 		{
@@ -141,9 +141,9 @@ class KWidevineBatchHelper
 		}
 	}
 	
-	private static function sendHttpRequest($wvLicenseServerUrl, $cgiUrl, $params, $providerParams = null)
+	private static function sendHttpRequest($wvRegServerHost, $cgiUrl, $params, $providerParams = null)
 	{
-		$url = $wvLicenseServerUrl.$cgiUrl.'?';
+		$url = $wvRegServerHost.$cgiUrl.'?';
 		
 		if($providerParams && count($providerParams))
 			$params[self::PROVIDER] = self::providerRequestEncode($providerParams);
