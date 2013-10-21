@@ -605,4 +605,4 @@ name												= KAsyncWidevineRepositorySync
 friendlyName										= Syncronize Widevine assets
 type												= KAsyncWidevineRepositorySync
 maximumExecutionTime								= 3000
-scriptPath             								= ../plugins/drm/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
+scriptPath             								= ../plugins/drm/providers/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php

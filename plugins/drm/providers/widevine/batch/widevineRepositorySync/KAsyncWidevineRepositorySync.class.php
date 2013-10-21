@@ -57,6 +57,8 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 		$licenseStartDate = $dataWrap->getLicenseStartDate();
 		$licenseEndDate = $dataWrap->getLicenseEndDate();
 		
+		$this->impersonate($job->partnerId);
+		
 		$drmPlugin = KalturaDrmClientPlugin::get(KBatchBase::$kClient);
 		$profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::WIDEVINE);
 		
@@ -66,6 +68,8 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 		}
 		
 		$this->updateFlavorAssets($job, $dataWrap);
+		
+		$this->unimpersonate();
 	}
 	
 	/**
@@ -109,9 +113,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	 * @param WidevineRepositorySyncJobDataWrap $dataWrap
 	 */
 	private function updateFlavorAssets(KalturaBatchJob $job, WidevineRepositorySyncJobDataWrap $dataWrap)
-	{
-		$this->impersonate($job->partnerId);
-		
+	{	
 		$startDate = $dataWrap->getLicenseStartDate();
 		$endDate = $dataWrap->getLicenseEndDate();	
 		
@@ -132,6 +134,5 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 				self::$kClient->flavorAsset->update($flavorAsset->id, $updatedFlavorAsset);
 			}		
 		}		
-		$this->unimpersonate();
 	}
 }

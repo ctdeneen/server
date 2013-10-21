@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator
+class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'drm';
 	
@@ -62,6 +62,17 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 			return array('DrmPermissionName');
 			
 		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 	
 	public static function getConfigParam($configName, $key)
