@@ -24,8 +24,37 @@ CREATE TABLE `drm_profile`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY `drm_profile_unique` (`partner_id`, `provider`, `status`),
 	KEY `partner_id_index`(`partner_id`)
+
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- drm_policy
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `drm_policy`;
+
+
+CREATE TABLE `drm_policy`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`profile_id` INTEGER  NOT NULL,
+	`name` TEXT  NOT NULL,
+	`system_name` VARCHAR(128) default '' NOT NULL,
+	`description` TEXT,
+	`provider` INTEGER  NOT NULL,
+	`status` INTEGER  NOT NULL,
+	`scenario` INTEGER  NOT NULL,
+	`license_type` INTEGER,
+	`license_expiration_policy` INTEGER,
+	`duration` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_index`(`partner_id`),
+	KEY `status_index`(`status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

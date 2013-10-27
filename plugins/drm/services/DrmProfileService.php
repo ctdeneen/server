@@ -7,8 +7,6 @@
  */
 class DrmProfileService extends KalturaBaseService
 {
-	const MYSQL_CODE_DUPLICATE_KEY = 23000;
-	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);

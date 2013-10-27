@@ -29,5 +29,8 @@ return array (
     'DrmProfileTableMap' => 'lib/model/map/DrmProfileTableMap.php',
     'DrmProfilePeer' => 'lib/model/DrmProfilePeer.php',
     'DrmProfile' => 'lib/model/DrmProfile.php',
+    'DrmPolicyTableMap' => 'lib/model/map/DrmPolicyTableMap.php',
+    'DrmPolicyPeer' => 'lib/model/DrmPolicyPeer.php',
+    'DrmPolicy' => 'lib/model/DrmPolicy.php',
   ),
 );
